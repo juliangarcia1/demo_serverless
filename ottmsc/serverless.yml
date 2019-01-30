@@ -1,0 +1,354 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: cat-facts # NOTE: update this with your service name
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+# frameworkVersion: "=X.X.X"
+
+provider:
+  name: aws
+  runtime: python3.6
+  stage: dev
+  region: us-east-2
+  stackName: cat-facts
+  deploymentBucket:
+    name: lambdas0
+  deploymentPrefix: cf-dist/serverless
+  role: arn:aws:iam::164825194737:role/SQS_access_role
+  cust_enviroment_type: develop 
+
+  # cfnRole: arn:aws:iam::560176646695:role/cloudformation-experimental-role
+
+# you can overwrite defaults here
+#  stage: dev
+#  region: us-east-1
+
+# you can add statements to the Lambda function's IAM Role here
+#  iamRoleStatements:
+#    - Effect: "Allow"
+#      Action:
+#        - "s3:ListBucket"
+#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
+#    - Effect: "Allow"
+#      Action:
+#        - "s3:PutObject"
+#      Resource:
+#        Fn::Join:
+#          - ""
+#          - - "arn:aws:s3:::"
+#            - "Ref" : "ServerlessDeploymentBucket"
+#            - "/*"
+
+# you can define service wide environment variables here
+#  environment:
+#    variable1: value1
+
+# you can add packaging information here
+package:
+  individually: true
+#  include:
+#    - include-me.py
+#    - include-me-dir/**
+  exclude:
+    - package-lock.json
+    - package.json
+    - msc_cat_facts/**
+    - node_modules/**
+    - cat-facts-dev-msc_cat_facts/**
+#    - exclude-me-dir/**
+
+#    The following are a few example events you can configure
+#    NOTE: Please make sure to change your handler code to work with those events
+#    Check the event documentation for details
+#    events:
+#      - http:
+#          path: users/create
+#          method: get
+#      - s3: ${env:BUCKET}
+#      - schedule: rate(10 minutes)
+#      - sns: greeter-topic
+#      - stream: arn:aws:dynamodb:region:XXXXXX:table/foo/stream/1970-01-01T00:00:00.000
+#      - alexaSkill: amzn1.ask.skill.xx-xx-xx-xx
+#      - alexaSmartHome: amzn1.ask.skill.xx-xx-xx-xx
+#      - iot:
+#          sql: "SELECT * FROM 'some_topic'"
+#      - cloudwatchEvent:
+#          event:
+#            source:
+#              - "aws.ec2"
+#            detail-type:
+#              - "EC2 Instance State-change Notification"
+#            detail:
+#              state:
+#                - pending
+#      - cloudwatchLog: '/aws/lambda/hello'
+#      - cognitoUserPool:
+#          pool: MyUserPool
+#          trigger: PreSignUp
+
+#    Define function environment variables here
+#    environment:
+#      variable2: value2
+
+# functions: 
+#   msc_cat_facts1: 
+#     handler: msc_cat_facts1.service.handler 
+#     # name: ${self:service}-${opt:stage}-msc_cat_facts1
+#     package:
+#       individually: true
+#       include:
+#         - service.handler
+#     # include:
+#         # - msc_cat_facts1/service.handler
+#       exclude:
+#         - msc_cat_facts2/**
+
+#   msc_cat_facts2:
+#     handler: msc_cat_facts2.service.handler
+#     # name: ${self:service}-${opt:stage}-msc_cat_facts2
+#     package:
+#       individually: true
+#       include:
+#         - service.handler
+#     # include:
+#         # - msc_cat_facts3/service.handler
+#       exclude:
+#         - msc_cat_facts1/**
+
+# stepFunctions:
+#   stateMachines:
+#     mscCatStateMachine:
+#       definition:
+#         Comment: "Get random cat fact."
+#         StartAt: msc_cat_facts1
+#         States:
+#           msc_cat_facts1:
+#             Type: Task
+#             Resource: "arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${opt:stage}-msc_cat_facts1"
+#             Next: msc_cat_facts2
+#           msc_cat_facts2:
+#             Type: Task
+#             Resource: "arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${opt:stage}-msc_cat_facts2"
+#             End: true
+
+
+## you can add CloudFormation resource templates here
+#resources:
+#  Resources:
+#
+#    mscCatStateMachine:
+#      Type: AWS::StepFunctions::StateMachine
+#      Properties:
+#        StateMachineName: mscCatStateMachine
+#        DefinitionString: |-
+#          {
+#            "StartAt": "StartUpMSC",
+#            "Version": "1.0",
+#            "TimeoutSeconds": 120,
+#            "States":
+#              {
+#                "StartUpMSC": {
+#                  "Comment": "Opening state for debugging and variable loading.",
+#                  "Type": "Pass",
+#                  "Next": "msc_cat_facts"
+#                },
+#                "msc_cat_facts": {
+#                  "Comment": "Get random cat fact",
+#                  "Type": "Task",
+#                  "ResultPath": "$",
+#                  "Resource": "arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${opt:stage}-msc_cat_facts",
+#                  "Next": "Final"
+#                },
+#                "Final": {
+#                  "Type": "Pass",
+#                  "End": true
+#                }
+#              }
+#          }
+#        RoleArn: arn:aws:iam::560176646695:role/lambda-test-dev-eu-west-2-lambdaRole
+#  Outputs:
+#     NewOutput:
+#       Description: "Description for the output"
+#       Value: "Some output value"
+
+# Note: assign a "name:" and with that reference it in resources
+stepFunctions:
+  stateMachines:
+    mscCatStateMachine:
+      name: MyMscCatStateMachine
+      # role: arn:aws:iam::164825194737:role/SQS_access_role
+      definition:
+        Comment: Get random cat fact.
+        TimeoutSeconds: 60
+        Version: "1.0"
+        StartAt: msc_cat_facts1
+        States:
+          msc_cat_facts1:
+            Comment: Function 1
+            Type: Task
+            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:msc_cat_facts1-${opt:stage}
+            ResultPath: $
+            Next: CfgCount
+            Retry: 
+              - ErrorEquals: 
+                    - Lambda.ServiceException
+                    - Lambda.SdkClientException
+                IntervalSeconds: 2
+                MaxAttempts: 6
+                BackoffRate: 2
+          CfgCount:
+            Type: Pass
+            Result:
+              success: true
+              count: 4
+              index: 0
+              step: 1
+            ResultPath: $.iterator
+            Next: IsCountGT4?
+          IsCountGT4?:
+            Type: Choice
+            Choices:
+              - Variable: $.iterator.success
+                BooleanEquals: true
+                Next: Wait
+              - Variable: $.iterator.success
+                BooleanEquals: false
+                Next: msc_cat_facts1
+            Default: CfgCount
+          Wait:
+            Type: Wait
+            Seconds: 5
+            Next: msc_cat_facts2
+          msc_cat_facts2:
+            Type: Task
+            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:msc_cat_facts2-${opt:stage}
+            End: true
+
+plugins:
+  - serverless-package-python-functions
+  - serverless-step-functions
+  - serverless-pseudo-parameters
+  # - serverless-secrets-plugin
+  # - serverless-python-requirements
+# custom:
+  # pythonRequirements:
+  # dockerizePip: non-linux
+
+
+
+custom:
+  pkgPyFuncs: # plugin configuration
+    buildDir: _build
+    requirementsFile: 'requirements.txt'
+    globalRequirements:
+      - ./requirements.txt
+    # globalIncludes:
+    #   - ././common_files
+    cleanup: false
+
+functions:
+  #Custom variables
+  msc_cat_facts1:
+    events: ${file(myCustomFile.yml):myevents2}
+    name: msc_cat_facts1-${opt:stage}
+    handler: service.handler
+    package:
+      include:
+        - msc_cat_facts1
+        - ../common_files
+      artifact: ${self:custom.pkgPyFuncs.buildDir}/msc_cat_facts1-${opt:stage}.zip
+    role: arn:aws:iam::#{AWS::AccountId}:role/lambda_read_write_sqs_messages
+    environment: #${file(secrets.dev.yml)}
+      ENV: ${self:provider.cust_enviroment_type}
+      MYVAR: ${env:PROJECT_PATH} 
+      MYVAR2: ${env:myvar}
+      MYSECRETKEY: ${env:mysecretkey1}
+      MYSECRETKEY2: ${env:mysecretkey2}
+
+  msc_cat_facts2:
+    name: msc_cat_facts2-${opt:stage}
+    handler: service.handler
+    package:
+      include:
+        - msc_cat_facts2
+      artifact: ${self:custom.pkgPyFuncs.buildDir}/msc_cat_facts2-${opt:stage}.zip
+    role: arn:aws:iam::#{AWS::AccountId}:role/lambda_read_write_sqs_messages
+    environment: 
+      mysecretkey: ${env:mysecretkey1}
+      mysecretkey2: ${env:mysecretkey2}
+  # MSCBBstateMachineTrigger:
+  #   Type: AWS::Lambda::Function
+  #   Properties:
+  #     Code:
+  #       S3Bucket: msc-ott-lambda-lon
+  #       S3Key: cf_dist/MSCBBtriggerStateMachine-d9e5fa0ff34216ef64fe1645a5db3c06-1543424808.6242151.zip
+  #     FunctionName: MSCBBstateMachineTrigger
+  #     Handler: service.handler
+  #     Role: arn:aws:iam::456157420328:role/msc-lambda-exec-role
+  #     Runtime: python3.6
+
+resources:
+  Resources:
+# 1) Add a CloudWatch Rule to trigger a Step Function.OK
+    # ScheduledRuleStepFunction:
+    #   Type: AWS::Events::Rule
+    #   Properties:
+    #     Description: "ScheduledRule"
+    #     ScheduleExpression: "rate(1 minute)"
+    #     State: "DISABLED"
+    #     Targets:
+    #       - Arn:
+    #           Ref: "MyMscCatStateMachine"
+    #         RoleArn: "arn:aws:iam::164825194737:role/service-role/AWS_Events_Invoke_Step_Functions_1627169698"
+    #         Id: "SFV1"
+# 2) Add a Queue definition and point its event to a lambda
+    # 2.1 Create Queue
+    MyEventsQueue:
+        Type: AWS::SQS::Queue
+        Properties:
+          DelaySeconds: 0
+          MaximumMessageSize: 262144
+          MessageRetentionPeriod: 345600
+          QueueName: "MyEventsQueue"
+          VisibilityTimeout: 120
+    # 2.2 Create SourceMapping
+    MyMscCatFacts1EventSourceMapping:
+        Type: AWS::Lambda::EventSourceMapping
+        Properties:
+          BatchSize: 1
+          Enabled: true
+          EventSourceArn:
+            Fn::GetAtt:
+              - MyEventsQueue
+              - Arn
+          FunctionName:
+            Fn::GetAtt:
+              - MscUnderscorecatUnderscorefacts1LambdaFunction
+              - Arn
+
+# 3) Add a Lambda execution permission resource and its lambda(not used, instead allow execution of State Function
+    # Note: below resource works but be carefull if msccat2 calls Step Function containing msccat2, 
+    # this(msccat2) is called recursively :( )
+
+    # MSCuploadLambdaInvokePermission:
+    #   Type: AWS::Lambda::Permission
+    #   Properties:
+    #     FunctionName:
+    #       Fn::GetAtt:
+    #       - MscUnderscorecatUnderscorefacts2LambdaFunction
+    #       - Arn
+    #     Action: lambda:InvokeFunction
+    #     Principal: s3.amazonaws.com
+    #     SourceAccount:
+    #       Ref: AWS::AccountId

@@ -1,0 +1,8 @@
+#msc_cat_facts1:
+#  handler: msc_cat_facts1.service.handler
+#  name: ${self:service}-${opt:stage}-msc_cat_facts1
+#  package:
+#    individually: true
+#    include:
+#      - ././utils
+#      # - ./../utils
