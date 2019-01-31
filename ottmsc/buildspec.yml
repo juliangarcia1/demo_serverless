@@ -45,11 +45,12 @@ phases:
       # - command
 artifacts:
   files:
-    - ottmsc/_build/**/*
+    # - ottmsc/_build/**/*.zip
+    - '**/cloudformation-template-update-stack.json'
     # - location
   name: $(AWS_REGION)-$(date +%Y-%m-%d)
-  #discard-paths: yes
-  #base-directory: location
+  discard-paths: yes
+  #base-directory: location:
 #cache:
   #paths:
     # - paths
