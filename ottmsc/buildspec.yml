@@ -39,17 +39,19 @@ phases:
       - python3.6 --version
       - (alias python=python3.6 && cd ottmsc && . ./venv/bin/activate && serverless package --stage staging)
       - (cd ottmsc/_build && ls -la )
-  #post_build:
-    #commands:
+  post_build:
+    commands:
+      - echo [default] > ~/.aws/config; echo region=$REGION >> ~/.aws/config;cat ~/.aws/config;cat ~/.aws/config
+      - echo [default] > ~/.aws/credentials; echo aws_access_key_id=$KEYID >>  ~/.aws/credentials; echo aws_secret_access_key=$SECRETKEY >> ~/.aws/credentials;cat ~/.aws/credentials
+      - (cd ottmsc && . ./venv/bin/activate && serverless deploy --stage staging )
       # - command
-      # - command
-artifacts:
-  files:
+#artifacts:
+  #files:
     # - ottmsc/_build/**/*.zip
-    - '**/cloudformation-template-update-stack.json'
+    # - '**/cloudformation-template-update-stack.json'
     # - location
-  name: $(AWS_REGION)-$(date +%Y-%m-%d)
-  discard-paths: yes
+  #name: $(AWS_REGION)-$(date +%Y-%m-%d)
+  #discard-paths: yes
   #base-directory: location:
 #cache:
   #paths:
