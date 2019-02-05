@@ -20,10 +20,10 @@ provider:
   name: aws
   runtime: python3.6
   stage: dev
-  region: us-east-2
+  region: eu-west-2
   stackName: cat-facts
   deploymentBucket:
-    name: lambdas0
+    name: lambdas1
   deploymentPrefix: cf-dist/serverless
   role: arn:aws:iam::164825194737:role/SQS_access_role
   cust_enviroment_type: develop 
