@@ -314,7 +314,7 @@ resources:
     #         Id: "SFV1"
 # 2) Add a Queue definition and point its event to a lambda
     # 2.1 Create Queue
-    MyEventsQueue:
+    MyEventsQueue2:
         Type: AWS::SQS::Queue
         Properties:
           DelaySeconds: 0
@@ -330,7 +330,7 @@ resources:
           Enabled: true
           EventSourceArn:
             Fn::GetAtt:
-              - MyEventsQueue
+              - MyEventsQueue2
               - Arn
           FunctionName:
             Fn::GetAtt:
