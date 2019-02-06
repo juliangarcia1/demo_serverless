@@ -1,0 +1,5 @@
+myevents2:
+  - schedule:
+     rate: rate(5 minutes)
+     enabled: false
+myvar: hello world

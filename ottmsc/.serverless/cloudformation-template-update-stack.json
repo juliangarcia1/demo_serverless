@@ -1,0 +1,249 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "The AWS CloudFormation template for this Serverless application",
+  "Resources": {
+    "MscUnderscorecatUnderscorefacts1LogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/msc_cat_facts1-staging"
+      }
+    },
+    "MscUnderscorecatUnderscorefacts2LogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/msc_cat_facts2-staging"
+      }
+    },
+    "MscUnderscorecatUnderscorefacts1LambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "lambdas0",
+          "S3Key": "cf-dist/serverless/cat-facts/staging/1548739294872-2019-01-29T05:21:34.872Z/msc_cat_facts1-staging.zip"
+        },
+        "FunctionName": "msc_cat_facts1-staging",
+        "Handler": "service.handler",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/lambda_read_write_sqs_messages"
+        },
+        "Runtime": "python3.6",
+        "Timeout": 6,
+        "Environment": {
+          "Variables": {
+            "ENV": "develop",
+            "MYVAR": "my_path",
+            "MYVAR2": "Hello",
+            "MYSECRETKEY": "hello_there!!",
+            "MYSECRETKEY2": "hello_there!!"
+          }
+        }
+      },
+      "DependsOn": [
+        "MscUnderscorecatUnderscorefacts1LogGroup"
+      ]
+    },
+    "MscUnderscorecatUnderscorefacts1LambdaVersionLkeCsSdV93tGw4tJHwdtmUtxdh8cT7t3ZC4gNT2vkgc": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "MscUnderscorecatUnderscorefacts1LambdaFunction"
+        },
+        "CodeSha256": "PS9Ae/DiLO72aEESB7mEAt9EdNE75BVJx7DD0bf+h3g="
+      }
+    },
+    "MscUnderscorecatUnderscorefacts2LambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "lambdas0",
+          "S3Key": "cf-dist/serverless/cat-facts/staging/1548739294872-2019-01-29T05:21:34.872Z/msc_cat_facts2-staging.zip"
+        },
+        "FunctionName": "msc_cat_facts2-staging",
+        "Handler": "service.handler",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/lambda_read_write_sqs_messages"
+        },
+        "Runtime": "python3.6",
+        "Timeout": 6,
+        "Environment": {
+          "Variables": {
+            "mysecretkey": "hello_there!!",
+            "mysecretkey2": "hello_there!!"
+          }
+        }
+      },
+      "DependsOn": [
+        "MscUnderscorecatUnderscorefacts2LogGroup"
+      ]
+    },
+    "MscUnderscorecatUnderscorefacts2LambdaVersionWvsH3LHoQTsQG6AZxHL79FLYLQgEHkPPbexM7HhsOdY": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "MscUnderscorecatUnderscorefacts2LambdaFunction"
+        },
+        "CodeSha256": "uMoFWxPlnDSJXOlCgfubMCqfNgsTDNRfBvQFE9zKvQk="
+      }
+    },
+    "IamRoleStateMachineExecution": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "states.us-east-2.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "staging-us-east-2-cat-facts-statemachine",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "lambda:InvokeFunction"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:msc_cat_facts1-staging"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:msc_cat_facts2-staging"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "MyMscCatStateMachine": {
+      "Type": "AWS::StepFunctions::StateMachine",
+      "Properties": {
+        "DefinitionString": {
+          "Fn::Sub": "{\n  \"Comment\": \"Get random cat fact.\",\n  \"TimeoutSeconds\": 60,\n  \"Version\": \"1.0\",\n  \"StartAt\": \"msc_cat_facts1\",\n  \"States\": {\n    \"msc_cat_facts1\": {\n      \"Comment\": \"Function 1\",\n      \"Type\": \"Task\",\n      \"Resource\": \"arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:msc_cat_facts1-staging\",\n      \"ResultPath\": \"$\",\n      \"Next\": \"CfgCount\",\n      \"Retry\": [\n        {\n          \"ErrorEquals\": [\n            \"Lambda.ServiceException\",\n            \"Lambda.SdkClientException\"\n          ],\n          \"IntervalSeconds\": 2,\n          \"MaxAttempts\": 6,\n          \"BackoffRate\": 2\n        }\n      ]\n    },\n    \"CfgCount\": {\n      \"Type\": \"Pass\",\n      \"Result\": {\n        \"success\": true,\n        \"count\": 4,\n        \"index\": 0,\n        \"step\": 1\n      },\n      \"ResultPath\": \"$.iterator\",\n      \"Next\": \"IsCountGT4?\"\n    },\n    \"IsCountGT4?\": {\n      \"Type\": \"Choice\",\n      \"Choices\": [\n        {\n          \"Variable\": \"$.iterator.success\",\n          \"BooleanEquals\": true,\n          \"Next\": \"Wait\"\n        },\n        {\n          \"Variable\": \"$.iterator.success\",\n          \"BooleanEquals\": false,\n          \"Next\": \"msc_cat_facts1\"\n        }\n      ],\n      \"Default\": \"CfgCount\"\n    },\n    \"Wait\": {\n      \"Type\": \"Wait\",\n      \"Seconds\": 5,\n      \"Next\": \"msc_cat_facts2\"\n    },\n    \"msc_cat_facts2\": {\n      \"Type\": \"Task\",\n      \"Resource\": \"arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:msc_cat_facts2-staging\",\n      \"End\": true\n    }\n  }\n}"
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "IamRoleStateMachineExecution",
+            "Arn"
+          ]
+        },
+        "StateMachineName": "MyMscCatStateMachine"
+      },
+      "DependsOn": "IamRoleStateMachineExecution"
+    },
+    "MscUnderscorecatUnderscorefacts1EventsRuleSchedule1": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "ScheduleExpression": "rate(5 minutes)",
+        "State": "DISABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "MscUnderscorecatUnderscorefacts1LambdaFunction",
+                "Arn"
+              ]
+            },
+            "Id": "msc_cat_facts1Schedule"
+          }
+        ]
+      }
+    },
+    "MscUnderscorecatUnderscorefacts1LambdaPermissionEventsRuleSchedule1": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "MscUnderscorecatUnderscorefacts1LambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": {
+          "Fn::Join": [
+            "",
+            [
+              "events.",
+              {
+                "Ref": "AWS::URLSuffix"
+              }
+            ]
+          ]
+        },
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "MscUnderscorecatUnderscorefacts1EventsRuleSchedule1",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "MyEventsQueue": {
+      "Type": "AWS::SQS::Queue",
+      "Properties": {
+        "DelaySeconds": 0,
+        "MaximumMessageSize": 262144,
+        "MessageRetentionPeriod": 345600,
+        "QueueName": "MyEventsQueue",
+        "VisibilityTimeout": 120
+      }
+    },
+    "MyMscCatFacts1EventSourceMapping": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "Properties": {
+        "BatchSize": 1,
+        "Enabled": true,
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "MyEventsQueue",
+            "Arn"
+          ]
+        },
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "MscUnderscorecatUnderscorefacts1LambdaFunction",
+            "Arn"
+          ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "ServerlessDeploymentBucketName": {
+      "Value": "lambdas0"
+    },
+    "MscUnderscorecatUnderscorefacts1LambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "MscUnderscorecatUnderscorefacts1LambdaVersionLkeCsSdV93tGw4tJHwdtmUtxdh8cT7t3ZC4gNT2vkgc"
+      }
+    },
+    "MscUnderscorecatUnderscorefacts2LambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "MscUnderscorecatUnderscorefacts2LambdaVersionWvsH3LHoQTsQG6AZxHL79FLYLQgEHkPPbexM7HhsOdY"
+      }
+    },
+    "MyMscCatStateMachineArn": {
+      "Description": "Current StateMachine Arn",
+      "Value": {
+        "Ref": "MyMscCatStateMachine"
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+#msc_cat_facts2:
+#  handler: msc_cat_facts2.service.handler
+#  name: ${self:service}-${opt:stage}-msc_cat_facts2
+#  package:
+#    individually: true
+#    include:
+###      - lambdas
