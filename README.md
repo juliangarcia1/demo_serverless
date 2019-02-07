@@ -71,3 +71,43 @@ Note right of John: Bob thinks a long<br/>long time, so long<br/>that the text d
 Bob-->Alice: Checking with John...
 Alice->John: Yes... John, how are you?
 ```
+
+
+# WebHook for Tag creation
+For get the CodePipeline execution starts when a new tag is created.
+1) Get the list of webhooks for the `region`:
+```
+aws codepipeline list-webhooks --region {region_of_your_pipeline} > all_webhooks.json
+```
+2) Locate there the pipeline previously created (Let's assume that)
+and copy the definition section.
+3) Create a weebhool.json file with the following content:
+```
+{
+    "webhook": {
+        "name": "The same as original webhook from codepipeline aws list-webhooks",
+        "targetPipeline": "The same as original webhook from codepipeline aws list-webhooks",
+        "targetAction": "Source",
+        "filters": [
+            {
+                "jsonPath": "$.ref_type",
+                "matchEquals": "tag"
+            },
+            {
+                "jsonPath": "$.ref_type",
+                "matchEquals": "tag"
+            }
+
+        ],
+        "authentication": "The same as original webhook from codepipeline aws list-webhooks",
+        "authenticationConfiguration": {
+            "SecretToken": The one provided by github's webhook"
+        }
+    }
+}
+```
+
+Then from you `aws cli` command tool:
+```
+aws codepipeline put-webhook --cli-input-json file://webhook.json --region {region where your Pipeline was created}
+```
