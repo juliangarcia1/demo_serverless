@@ -92,12 +92,7 @@ and copy the definition section.
             {
                 "jsonPath": "$.ref_type",
                 "matchEquals": "tag"
-            },
-            {
-                "jsonPath": "$.ref_type",
-                "matchEquals": "tag"
             }
-
         ],
         "authentication": "The same as original webhook from codepipeline aws list-webhooks",
         "authenticationConfiguration": {
