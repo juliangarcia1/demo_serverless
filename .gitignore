@@ -1,0 +1,10 @@
+venv
+venv/*
+.DS_Store
+.DS_Store/*
+.git_bkp
+.git_bkp/*
+.idea
+.idea/*
+__pycache__/*
+*.pyc
