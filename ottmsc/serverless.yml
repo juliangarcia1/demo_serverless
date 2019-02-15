@@ -320,7 +320,7 @@ resources:
           DelaySeconds: 0
           MaximumMessageSize: 262144
           MessageRetentionPeriod: 345600
-          QueueName: "MyEventsQueue"
+          QueueName: "MyEventsQueue2"
           VisibilityTimeout: 120
     # 2.2 Create SourceMapping
     MyMscCatFacts1EventSourceMapping:
