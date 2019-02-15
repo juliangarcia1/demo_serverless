@@ -1,5 +1,5 @@
 import pytest
 
+
 def test_service():
-	pass
-    
+    raise Exception('Exception generated')
